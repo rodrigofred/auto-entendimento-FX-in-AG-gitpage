@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Interativo — Algoritmos Genéticos</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Configurações adicionais de tema do Tailwind -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              bg: '#070607',
+              panel: '#12060a',
+              wine: '#7b0f1a',
+              wineDark: '#4a0710',
+              neon: '#ffd700',
+              muted: '#d7c9b0',
+              accent: '#ffea00'
+            }
+          },
+          fontFamily: {
+            mono: ['Courier New', 'Courier', 'monospace'],
+            serif: ['Georgia', 'Times New Roman', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons (Fallback com SVG embutidos ou CDN simples) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Estilos personalizados para o tema CyberGothic */
+    .cyber-gothic-shadow {
+      box-shadow: 0 8px 24px rgba(123, 15, 26, 0.45);
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #7b0f1a;
+      border-radius: 3px;
+    }
+    .ascii-art {
+      font-family: 'Courier New', Courier, monospace;
+      line-height: 1.15;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-cyber-bg dark:text-cyber-muted transition-colors duration-300 min-h-screen flex flex-col font-serif">
+
+  <!-- Header / Barra de Navegação -->
+  <header class="border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-50 transition-colors duration-300">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
+      
+      <!-- Logo & Título -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-cyber-wine to-cyber-wineDark flex items-center justify-center text-cyber-neon font-mono font-bold text-lg cyber-gothic-shadow border border-cyber-wine">
+          AG
+        </div>
+        <div>
+          <h1 class="text-lg font-bold font-mono tracking-wider text-slate-900 dark:text-cyber-neon">
+            ALGORITMOS GENÉTICOS
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-amber-200 font-sans">
+            Ciclo de Evolução e Estudo da Mochila Binária
+          </p>
+        </div>
+      </div>
+
+      <!-- Menu de Navegação (Tabs) -->
+      <nav class="flex items-center bg-slate-100 dark:bg-zinc-900 p-1 rounded-lg border border-slate-200 dark:border-zinc-800 font-mono text-xs">
+        <button onclick="switchTab('introducao')" id="tab-introducao" class="tab-btn px-3 py-1.5 rounded-md transition-all duration-200 font-medium bg-white text-slate-900 shadow-sm dark:bg-cyber-wine dark:text-cyber-neon">
+          1. Ciclo Geral
+        </button>
+        <button onclick="switchTab('mochila')" id="tab-mochila" class="tab-btn px-3 py-1.5 rounded-md transition-all duration-200 font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white">
+          2. Mochila Binária
+        </button>
+        <button onclick="switchTab('modos')" id="tab-modos" class="tab-btn px-3 py-1.5 rounded-md transition-all duration-200 font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white">
+          3. Comparar Modos
+        </button>
+      </nav>
+
+      <!-- Botão Tema Claro / Escuro -->
+      <button onclick="toggleTheme()" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-900 text-xs font-mono transition-all">
+        <span class="dark:hidden flex items-center gap-1">
+          <i data-lucide="moon" class="w-4 h-4 text-purple-700"></i> Escuro
+        </span>
+        <span class="hidden dark:flex items-center gap-1 text-cyber-neon">
+          <i data-lucide="sun" class="w-4 h-4"></i> Claro
+        </span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
+
+    <!-- ================= PAGE 1: INTRODUÇÃO / CICLO GERAL ================= -->
+    <div id="page-introducao" class="page-content block space-y-8 animate-fade-in">
+      
+      <!-- Introdução Hero -->
+      <div class="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-md">
+        <div class="flex items-start gap-4">
+          <div class="p-3 bg-red-100 dark:bg-red-950/40 text-cyber-wine dark:text-cyber-neon rounded-lg hidden md:block">
+            <i data-lucide="dna" class="w-8 h-8"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold font-mono text-slate-900 dark:text-cyber-neon mb-2">
+              O Ciclo dos Algoritmos Genéticos
+            </h2>
+            <p class="text-base text-slate-700 dark:text-zinc-300 leading-relaxed mb-4">
+              Os algoritmos genéticos simulam o processo de seleção natural proposto por Charles Darwin. Uma população de soluções potenciais (indivíduos) evolui ao longo de gerações. Esse processo é controlado por variáveis cruciais: o <strong class="text-cyber-wine dark:text-cyber-neon">tamanho da população</strong> determina o espaço de busca inicial, a <strong class="text-cyber-wine dark:text-cyber-neon">taxa de crossover</strong> controla o grau de recombinação de boas características, e a <strong class="text-cyber-wine dark:text-cyber-neon">taxa de mutação</strong> impede que o algoritmo fique preso em mínimos locais, introduzindo diversidade aleatória.
+            </p>
+            <div class="p-3 bg-slate-100 dark:bg-zinc-900/50 border-l-4 border-cyber-wine rounded-r-md text-sm font-sans italic text-slate-600 dark:text-zinc-300">
+              "Esse ciclo se repete até atingir o critério de parada — fitness ótimo, convergência ou número máximo de iterações/gerações."
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção: 4 Formas de Registro do Log Geral -->
+      <div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+          <h3 class="text-xl font-bold font-mono text-slate-900 dark:text-cyber-neon flex items-center gap-2">
+            <i data-lucide="terminal" class="w-5 h-5 text-cyber-wine dark:text-cyber-neon"></i>
+            1 Ciclo, 4 Formas de Registro de Log
+          </h3>
+          <span class="text-xs bg-slate-200 dark:bg-zinc-800 px-3 py-1 rounded-full font-mono">
+            Fixando o entendimento conceitual
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Forma 1: Texto Linear -->
+          <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="px-2 py-0.5 text-xs font-mono rounded bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300">Forma 1</span>
+                <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white">Texto Linear de Execução</h4>
+              </div>
+              <p class="text-xs font-mono text-slate-500 dark:text-zinc-400 mb-3">Útil para logs rápidos em console de linha única.</p>
+              <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-emerald-400 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+<span class="text-cyan-600 dark:text-cyan-400">[LOG]</span> Início do ciclo → geração de população → cálculo de fitness → seleção → crossover → mutação → concatenação → avaliação → repetição até critério de parada.
+<span class="text-purple-600 dark:text-purple-400">Variáveis:</span> tamanho_pop, taxa_mut, taxa_cross, max_gen, prob_sel, fitness_target.
+              </div>
+            </div>
+          </div>
+
+          <!-- Forma 3: Fluxo Compacto -->
+          <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="px-2 py-0.5 text-xs font-mono rounded bg-purple-100 text-purple-800 dark:bg-purple-950/50 dark:text-purple-300">Forma 3</span>
+                <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white">Fluxo Compacto de Pipeline</h4>
+              </div>
+              <p class="text-xs font-mono text-slate-500 dark:text-zinc-400 mb-3">Ideal para visualização rápida da arquitetura de dados.</p>
+              <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-amber-400 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+POP → FIT → SEL → CROSS → MUT → CONCAT → STOP
+<span class="text-purple-600 dark:text-purple-400">Vars:</span> pop_size, mut_rate, cross_rate, gen_limit, fitness_goal.
+              </div>
+            </div>
+          </div>
+
+          <!-- Forma 2: Tabela ASCII -->
+          <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 lg:col-span-2">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2 py-0.5 text-xs font-mono rounded bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300">Forma 2</span>
+              <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white">Estrutura em Tabela ASCII</h4>
+            </div>
+            <p class="text-xs font-mono text-slate-500 dark:text-zinc-400 mb-3">Excelente para documentação no cabeçalho de códigos fonte.</p>
+            <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-zinc-300 overflow-x-auto ascii-art">
++----------------------+---------------------------+
+| Etapa                | Variáveis principais      |
++----------------------+---------------------------+
+| População inicial    | tamanho_pop, genes_bin     |
+| Fitness              | função_fitness, objetivo  |
+| Seleção              | prob_sel, elite_rate      |
+| Crossover            | taxa_cross, ponto_corte   |
+| Mutação              | taxa_mut, tipo_mut        |
+| Parada               | max_gen, fitness_target   |
++----------------------+---------------------------+
+            </div>
+          </div>
+
+          <!-- Forma 4: Pseudo-código -->
+          <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 lg:col-span-2">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2 py-0.5 text-xs font-mono rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-950/50 dark:text-yellow-300">Forma 4</span>
+              <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white">Pseudo-código Algorítmico</h4>
+            </div>
+            <p class="text-xs font-mono text-slate-500 dark:text-zinc-400 mb-3">Lógica abstrata de programação estruturada de alto nível.</p>
+            <div class="bg-slate-100 dark:bg-zinc-900 p-4 rounded font-mono text-xs text-slate-800 dark:text-zinc-200 overflow-x-auto leading-relaxed">
+<span class="text-red-600 dark:text-red-400">for</span> gen <span class="text-red-600 dark:text-red-400">in range</span>(max_gen):
+    populacao = gerar(pop_size)
+    fitness = avaliar(populacao)
+    selecao = escolher(fitness, prob_sel)
+    filhos = crossover(selecao, taxa_cross)
+    mutados = mutacao(filhos, taxa_mut)
+    atualizar(populacao, mutados)
+    <span class="text-red-600 dark:text-red-400">if</span> fitness >= fitness_target: <span class="text-red-600 dark:text-red-400">break</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= PAGE 2: PROBLEMA DA MOCHILA (INTERATIVO) ================= -->
+    <div id="page-mochila" class="page-content hidden space-y-8 animate-fade-in">
+      
+      <!-- Explicação da Mochila Binária -->
+      <div class="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-md">
+        <h2 class="text-2xl font-bold font-mono text-slate-900 dark:text-cyber-neon mb-3 flex items-center gap-2">
+          <i data-lucide="package-open" class="w-6 h-6"></i>
+          O Problema da Mochila Binária (0-1 Knapsack)
+        </h2>
+        <p class="text-base text-slate-700 dark:text-zinc-300 leading-relaxed mb-4">
+          Na mochila binária, temos um conjunto de itens, cada um com um <strong>peso</strong> e um <strong>valor</strong>. O objetivo é escolher um subconjunto de itens de modo a maximizar o valor total, sem exceder a <strong>capacidade máxima</strong> de peso suportada pela mochila. 
+          No AG, cada gene do cromossomo representa a presença (<span class="text-emerald-500 font-bold">1</span>) ou ausência (<span class="text-rose-500 font-bold">0</span>) de um item específico.
+        </p>
+
+        <!-- Detalhes de Penalidade e Reparo -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+          <div class="p-4 bg-orange-50 dark:bg-zinc-900/40 rounded-lg border border-orange-200 dark:border-zinc-800">
+            <h4 class="font-bold text-sm text-amber-700 dark:text-cyber-neon font-mono mb-2">Penalização de Fitness</h4>
+            <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
+              Caso uma solução ultrapasse a capacidade de peso, o seu fitness é penalizado reduzindo-se o seu valor final proporcionalmente ao excesso, desencorajando a seleção dessa linhagem.
+            </p>
+          </div>
+          <div class="p-4 bg-emerald-50 dark:bg-zinc-900/40 rounded-lg border border-emerald-200 dark:border-zinc-800">
+            <h4 class="font-bold text-sm text-emerald-700 dark:text-emerald-400 font-mono mb-2">Heurística de Reparo</h4>
+            <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
+              Mecanismo que varre a solução inválida e remove os itens menos eficientes (pior relação valor/peso) até que o peso total caiba novamente no limite da mochila.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULADOR INTERATIVO EM TEMPO REAL -->
+      <div class="bg-white dark:bg-zinc-950 p-6 rounded-xl border-2 border-cyber-wine dark:border-cyber-wine rounded-xl shadow-lg space-y-6">
+        
+        <!-- Header do Simulador -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 dark:border-zinc-800 pb-4 gap-4">
+          <div>
+            <h3 class="text-xl font-bold font-mono text-slate-950 dark:text-white flex items-center gap-2">
+              <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Simulador Interativo do AG da Mochila
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">Assista à convergência evolutiva acontecendo ao vivo no seu navegador!</p>
+          </div>
+
+          <!-- Controles Rápidos -->
+          <div class="flex flex-wrap gap-2">
+            <button onclick="startKnapsackSimulation()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-mono text-xs font-bold py-2 px-4 rounded shadow-md transition-all flex items-center gap-1.5">
+              <i data-lucide="play" class="w-4 h-4"></i> Iniciar Evolução
+            </button>
+            <button onclick="resetSimulation()" class="bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-300 font-mono text-xs py-2 px-3 rounded transition-all">
+              Resetar
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Coluna Configurações do AG (Esquerda) -->
+          <div class="lg:col-span-4 space-y-4 bg-slate-50 dark:bg-zinc-900/50 p-4 rounded-lg border border-slate-200 dark:border-zinc-800">
+            <h4 class="font-bold font-mono text-xs text-cyber-wine dark:text-cyber-neon uppercase tracking-wider mb-2">Configurar Parâmetros</h4>
+            
+            <!-- Capacidade -->
+            <div>
+              <label class="block text-xs font-mono mb-1 text-slate-700 dark:text-zinc-300 flex justify-between">
+                <span>Capacidade Max:</span>
+                <span id="label-cap" class="font-bold text-cyber-wine dark:text-cyber-neon">15 kg</span>
+              </label>
+              <input type="range" id="sim-capacity" min="5" max="30" value="15" oninput="updateSimParams()" class="w-full h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-cyber-wine" />
+            </div>
+
+            <!-- População -->
+            <div>
+              <label class="block text-xs font-mono mb-1 text-slate-700 dark:text-zinc-300 flex justify-between">
+                <span>Tam. População (pop_size):</span>
+                <span id="label-pop" class="font-bold text-cyber-wine dark:text-cyber-neon">30</span>
+              </label>
+              <input type="range" id="sim-pop-size" min="10" max="100" step="5" value="30" oninput="updateSimParams()" class="w-full h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-cyber-wine" />
+            </div>
+
+            <!-- Mutação -->
+            <div>
+              <label class="block text-xs font-mono mb-1 text-slate-700 dark:text-zinc-300 flex justify-between">
+                <span>Taxa Mutação (taxa_mut):</span>
+                <span id="label-mut" class="font-bold text-cyber-wine dark:text-cyber-neon">10%</span>
+              </label>
+              <input type="range" id="sim-mut-rate" min="1" max="50" value="10" oninput="updateSimParams()" class="w-full h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-cyber-wine" />
+            </div>
+
+            <!-- Crossover -->
+            <div>
+              <label class="block text-xs font-mono mb-1 text-slate-700 dark:text-zinc-300 flex justify-between">
+                <span>Taxa Crossover (taxa_cross):</span>
+                <span id="label-cross" class="font-bold text-cyber-wine dark:text-cyber-neon">80%</span>
+              </label>
+              <input type="range" id="sim-cross-rate" min="30" max="100" value="80" oninput="updateSimParams()" class="w-full h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-cyber-wine" />
+            </div>
+
+            <!-- Gerações -->
+            <div>
+              <label class="block text-xs font-mono mb-1 text-slate-700 dark:text-zinc-300 flex justify-between">
+                <span>Max Gerações:</span>
+                <span id="label-gen" class="font-bold text-cyber-wine dark:text-cyber-neon">40</span>
+              </label>
+              <input type="range" id="sim-max-gen" min="10" max="100" value="40" oninput="updateSimParams()" class="w-full h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-cyber-wine" />
+            </div>
+
+            <div class="pt-2 border-t border-slate-200 dark:border-zinc-800">
+              <h5 class="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-2">Itens Disponíveis</h5>
+              <div class="text-[11px] font-mono space-y-1 text-slate-600 dark:text-zinc-300 h-32 overflow-y-auto custom-scroll pr-1" id="items-list-container">
+                <!-- Gerado Dinamicamente -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna Gráficos e Status (Meio e Direita) -->
+          <div class="lg:col-span-8 flex flex-col justify-between space-y-4">
+            
+            <!-- Dashboard de Status e Resultados -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-100 dark:bg-zinc-900/30 p-3 rounded-lg border border-slate-200 dark:border-zinc-800 text-center">
+              <div>
+                <span class="block text-[10px] uppercase tracking-wider font-mono text-slate-500">Geração</span>
+                <span id="stat-gen" class="text-lg font-bold font-mono text-cyber-wine dark:text-cyber-neon">0 / 40</span>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase tracking-wider font-mono text-slate-500">Melhor Fitness</span>
+                <span id="stat-best-fit" class="text-lg font-bold font-mono text-emerald-600 dark:text-emerald-400">$0</span>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase tracking-wider font-mono text-slate-500">Peso Associado</span>
+                <span id="stat-weight" class="text-lg font-bold font-mono text-sky-600 dark:text-sky-400">0 kg</span>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase tracking-wider font-mono text-slate-500">Status</span>
+                <span id="stat-status" class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400 rounded-full font-mono inline-block mt-1">Parado</span>
+              </div>
+            </div>
+
+            <!-- Gráfico de Convergência (Canvas) -->
+            <div class="relative bg-zinc-950 p-3 rounded-lg border border-slate-200 dark:border-zinc-800 h-64 flex flex-col justify-between">
+              <div class="absolute top-2 left-3 flex gap-4 text-[10px] font-mono text-zinc-400 z-10">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-emerald-400 inline-block"></span> Melhor Solução</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-amber-400 inline-block"></span> Média da População</span>
+              </div>
+              <canvas id="convergenceChart" class="w-full h-full"></canvas>
+            </div>
+
+            <!-- Cromossomo Vencedor Atual -->
+            <div class="bg-slate-100 dark:bg-zinc-900/40 p-4 rounded-lg border border-slate-200 dark:border-zinc-800">
+              <h5 class="text-xs font-mono font-bold text-slate-700 dark:text-zinc-300 mb-2">Melhor Configuração de Itens Encontrada:</h5>
+              <div class="flex flex-wrap gap-2" id="best-chromosome-visual">
+                <span class="text-xs text-slate-500 dark:text-zinc-400 font-mono italic">Inicie o simulador para começar a povoar a mochila.</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Seção: Logs da Mochila (4 Formas) -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-bold font-mono text-slate-900 dark:text-cyber-neon flex items-center gap-2">
+          <i data-lucide="file-text" class="w-5 h-5"></i>
+          Especificações Técnicas: 4 Formas do Ciclo de Mochila
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Mochila Forma 1: Linear -->
+          <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800">
+            <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white mb-2 flex items-center gap-1">
+              <span class="text-xs bg-cyan-100 text-cyan-800 dark:bg-cyan-950/40 dark:text-cyan-300 px-1.5 py-0.5 rounded">F1</span> Texto Linear
+            </h4>
+            <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-zinc-300 leading-relaxed max-h-48 overflow-y-auto custom-scroll">
+<span class="text-cyan-500 font-bold">[LOG]</span> Início → gerar população (binária: cada gene = incluir item) → decodificar cromossomos → calcular fitness (soma valores; penalizar se peso > capacidade) → seleção (roulette/torneio) → crossover → mutação → reparo/ajuste (garantir capacidade) → avaliar nova população → atualizar melhor solução → repetir até critério de parada.
+<br><br>
+<span class="text-purple-400 font-bold">Variáveis:</span> capacidade, pesos[], valores[], pop_size, taxa_cross, taxa_mut, max_gen, penalidade_peso.
+            </div>
+          </div>
+
+          <!-- Mochila Forma 3: Fluxo -->
+          <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800">
+            <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white mb-2 flex items-center gap-1">
+              <span class="text-xs bg-purple-100 text-purple-800 dark:bg-purple-950/40 dark:text-purple-300 px-1.5 py-0.5 rounded">F3</span> Fluxo Compacto
+            </h4>
+            <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-zinc-300 leading-relaxed">
+<div class="bg-zinc-950 p-2.5 rounded text-amber-400 font-bold tracking-wider mb-2 text-center text-[11px]">
+POP → DECODE → FITNESS → SEL → CROSS → MUT → REPAIR → EVAL → UPDATE_BEST → STOP
+</div>
+<span class="text-purple-400 font-bold">Vars:</span> capacity, weights[], values[], pop_size, cross_rate, mut_rate, penalty_factor, gen_limit.
+            </div>
+          </div>
+
+          <!-- Mochila Forma 2: ASCII -->
+          <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 md:col-span-2">
+            <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white mb-2 flex items-center gap-1">
+              <span class="text-xs bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300 px-1.5 py-0.5 rounded">F2</span> Tabela ASCII Mochila
+            </h4>
+            <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-zinc-300 overflow-x-auto ascii-art">
++----------------------+-------------------------------+
+| Etapa                | Variáveis / Observações       |
++----------------------+-------------------------------+
+| Representação        | cromossomo binário; n itens   |
+| Decodificação        | peso_total, valor_total       |
+| Fitness              | valor_total - penalidade(peso)|
+| Seleção              | método: torneio/roulette      |
+| Crossover            | taxa_cross, ponto_corte       |
+| Mutação              | taxa_mut, flip bit            |
+| Reparo/Validação     | remover itens até caber       |
+| Substituição         | elitismo ou geração completa  |
+| Parada               | max_gen ou fitness_target     |
++----------------------+-------------------------------+
+            </div>
+          </div>
+
+          <!-- Mochila Forma 4: Pseudo-código -->
+          <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 md:col-span-2">
+            <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white mb-2 flex items-center gap-1">
+              <span class="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-300 px-1.5 py-0.5 rounded">F4</span> Algoritmo de Execução
+            </h4>
+            <div class="bg-slate-100 dark:bg-zinc-900 p-4 rounded font-mono text-xs text-slate-800 dark:text-zinc-200 overflow-x-auto leading-relaxed">
+<span class="text-emerald-500">inicializar</span>(pop_size)
+<span class="text-red-500">for</span> gen <span class="text-red-500">in range</span>(max_gen):
+    <span class="text-red-500">for</span> individuo <span class="text-red-500">in</span> populacao:
+        peso, valor = <span class="text-cyan-500">decodificar</span>(individuo)
+        <span class="text-red-500">if</span> peso <= capacidade:
+            fitness = valor
+        <span class="text-red-500">else</span>:
+            fitness = valor - penalidade*(peso - capacidade)
+            
+    selecao = <span class="text-cyan-500">escolher</span>(populacao, fitness, method)
+    filhos = <span class="text-cyan-500">crossover</span>(selecao, taxa_cross)
+    mutados = <span class="text-cyan-500">mutacao</span>(filhos, taxa_mut)
+    
+    <span class="text-red-500">para cada</span> filho <span class="text-red-500">em</span> mutados:
+        <span class="text-red-500">if</span> <span class="text-cyan-500">peso</span>(filho) > capacidade:
+            filho = <span class="text-emerald-500">reparar</span>(filho)  <span class="text-gray-500"># remove itens menos eficientes até caber</span>
+            
+    populacao = <span class="text-cyan-500">substituir</span>(populacao, mutados, elitismo)
+    <span class="text-cyan-500">atualizar</span>(melhor_sol)
+    <span class="text-red-500">if</span> melhor_sol.fitness >= fitness_target: <span class="text-red-500">break</span>
+<span class="text-red-500">retornar</span> melhor_sol
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= PAGE 3: COMPARAÇÃO DE MODOS ================= -->
+    <div id="page-modos" class="page-content hidden space-y-8 animate-fade-in">
+      
+      <!-- Introdução da Comparação -->
+      <div class="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-md">
+        <h2 class="text-2xl font-bold font-mono text-slate-900 dark:text-cyber-neon mb-3 flex items-center gap-2">
+          <i data-lucide="git-compare" class="w-6 h-6"></i>
+          Modos Alternativos de Execução de AGs
+        </h2>
+        <p class="text-base text-slate-700 dark:text-zinc-300 leading-relaxed">
+          Dependendo do tipo de problema e do espaço de busca, o fluxo clássico do algoritmo genético pode ser modificado. O Elitismo protege as melhores soluções, a Busca Local intensifica a exploração de vizinhanças (Algoritmos Meméticos), e a Mutação Aritmética adapta-se a soluções numéricas contínuas sem necessitar de crossover. Veja abaixo a comparação direta de comportamento.
+        </p>
+      </div>
+
+      <!-- Tabela de Comparação Rápida -->
+      <div class="bg-white dark:bg-zinc-950 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-md overflow-hidden">
+        <div class="p-4 bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800">
+          <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-cyber-neon">Matriz Comparativa de Desempenho</h4>
+        </div>
+        <div class="overflow-x-auto custom-scroll">
+          <table class="w-full text-left border-collapse text-xs md:text-sm">
+            <thead>
+              <tr class="bg-slate-100 dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-b border-slate-200 dark:border-zinc-800">
+                <th class="p-3 font-mono font-bold text-cyber-wine dark:text-cyber-neon">Modo</th>
+                <th class="p-3 font-mono font-bold">Convergência</th>
+                <th class="p-3 font-mono font-bold">Diversidade</th>
+                <th class="p-3 font-mono font-bold">Complexidade</th>
+                <th class="p-3 font-mono font-bold">Melhor uso</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-zinc-800">
+              <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
+                <td class="p-3 font-bold">Clássico (Crossover + Mutação)</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400">Média</span></td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400">Média</span></td>
+                <td class="p-3 text-slate-500">Baixa</td>
+                <td class="p-3 italic">Problemas gerais, robustez padrão</td>
+              </tr>
+              <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
+                <td class="p-3 font-bold">Mutação Aritmética (Sem Crossover)</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">Rápida</span></td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400">Baixa</span></td>
+                <td class="p-3 text-slate-500">Baixa</td>
+                <td class="p-3 italic">Representações numéricas ou reais naturais</td>
+              </tr>
+              <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
+                <td class="p-3 font-bold">Steady-state com Elitismo</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-950/40 dark:text-sky-400">Lenta → Estável</span></td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">Alta</span></td>
+                <td class="p-3 text-slate-500">Média</td>
+                <td class="p-3 italic">Preservar boas soluções, evitar descarte de elite</td>
+              </tr>
+              <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
+                <td class="p-3 font-bold">Híbrido / Memético (GA + Busca Local)</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">Rápida/Precisa</span></td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400">Média</span></td>
+                <td class="p-3 text-slate-500">Alta</td>
+                <td class="p-3 italic">Otimização refinada, combinatórios altamente complexos</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Detalhes Expandidos de Cada Modo -->
+      <div class="space-y-6">
+        
+        <!-- Modo 1 -->
+        <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-900 pb-3 mb-3">
+            <h4 class="font-bold font-mono text-base text-slate-900 dark:text-cyber-neon">Modo 1 — Clássico (Crossover + Mutação)</h4>
+            <span class="text-xs bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded font-mono text-slate-500">Vars: pop_size, cross_rate, mut_rate</span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-zinc-400 mb-4 leading-relaxed">
+            Algoritmo Genético padrão. Gera a população inicial de forma aleatória, aplica seleção proporcional (como roleta) ou torneio, realiza o cruzamento (crossover) de 1 ponto ou uniforme e aplica a mutação bit-flip em cada gene dos novos gerados com probabilidade definida.
+          </p>
+          <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-zinc-300 overflow-x-auto">
+<span class="text-blue-500"># Log Curto:</span>
+[LOG] POP -> FIT -> SEL -> CROSS -> MUT -> UPDATE -> REPEAT
+          </div>
+        </div>
+
+        <!-- Modo 2 -->
+        <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-900 pb-3 mb-3">
+            <h4 class="font-bold font-mono text-base text-slate-900 dark:text-cyber-neon">Modo 2 — Mutação Aritmética (Sem Crossover)</h4>
+            <span class="text-xs bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded font-mono text-slate-500">Vars: pop_size, op_mut, n_bits, bound_policy</span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-zinc-400 mb-4 leading-relaxed">
+            Nesta abordagem de mutação intensiva, cromossomos binários são tratados diretamente como valores numéricos inteiros ou de precisão flutuante. O algoritmo aplica operações matemáticas clássicas (incremento, decremento, exponenciação) para produzir variações mutadas, sem a necessidade de crossover.
+          </p>
+          <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-zinc-300 overflow-x-auto">
+<span class="text-blue-500"># Log Curto:</span>
+[LOG] POP -> DECOD -> ARITH_MUT -> ENCODE -> EVAL -> REPEAT
+          </div>
+        </div>
+
+        <!-- Modo 3 -->
+        <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-900 pb-3 mb-3">
+            <h4 class="font-bold font-mono text-base text-slate-900 dark:text-cyber-neon">Modo 3 — Steady-state com Elitismo</h4>
+            <span class="text-xs bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded font-mono text-slate-500">Vars: pop_size, offspring_rate, elitism_count</span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-zinc-400 mb-4 leading-relaxed">
+            Em vez de substituir todos os indivíduos de uma geração de uma vez, esta variante gera apenas um pequeno lote de filhos a cada iteração (offspring_per_gen), substituindo diretamente as piores soluções da geração anterior e preservando rigidamente a fração de elite intacta.
+          </p>
+          <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-zinc-300 overflow-x-auto">
+<span class="text-blue-500"># Log Curto:</span>
+[LOG] INIT -> EVAL -> (SEL->CROSS->MUT->EVAL->REPLACE) -> KEEP_ELITE
+          </div>
+        </div>
+
+        <!-- Modo 4 -->
+        <div class="bg-white dark:bg-zinc-950 p-5 rounded-lg border border-slate-200 dark:border-zinc-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-900 pb-3 mb-3">
+            <h4 class="font-bold font-mono text-base text-slate-900 dark:text-cyber-neon">Modo 4 — Híbrido / Memético (GA + Busca Local)</h4>
+            <span class="text-xs bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded font-mono text-slate-500">Vars: pop_size, cross_rate, ls_rate, ls_iters</span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-zinc-400 mb-4 leading-relaxed">
+            Agrega o poder global de exploração dos AGs clássicos com a velocidade de refino local de algoritmos de subida de encosta (Hill-Climbers) ou busca tabu. Aplica-se busca local em soluções promissoras geradas para acelerar a precisão em problemas complexos.
+          </p>
+          <div class="bg-slate-100 dark:bg-zinc-900 p-3 rounded font-mono text-xs text-slate-800 dark:text-zinc-300 overflow-x-auto">
+<span class="text-blue-500"># Log Curto:</span>
+[LOG] POP -> FIT -> SEL -> CROSS -> MUT -> LOCAL_SEARCH -> UPDATE -> REPEAT
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Rodapé / Footer -->
+  <footer class="border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-6 transition-colors duration-300 text-xs text-center font-mono space-y-2">
+    <div class="max-w-6xl mx-auto px-4 text-slate-500 dark:text-zinc-500">
+      Design CyberGothic Interativo — Cores Amarelo Neon e Vinho.
+    </div>
+    <div class="text-slate-400 dark:text-zinc-600">
+      Desenvolvido para fixação e análise prática de Algoritmos Genéticos Aplicados.
+    </div>
+  </footer>
+
+  <!-- ================= LOGIC AND AG SIMULATOR ENGINE (JAVASCRIPT) ================= -->
+  <script>
+    // Gerenciador de Abas (Tabs Navigation)
+    function switchTab(tabId) {
+      document.querySelectorAll('.page-content').forEach(el => {
+        el.classList.add('hidden');
+        el.classList.remove('block');
+      });
+      document.getElementById('page-' + tabId).classList.remove('hidden');
+      document.getElementById('page-' + tabId).classList.add('block');
+
+      // Atualiza estilo dos botões da aba
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-cyber-wine', 'dark:text-cyber-neon');
+        btn.classList.add('text-slate-600', 'dark:text-zinc-400', 'hover:text-slate-900', 'dark:hover:text-white');
+      });
+
+      const activeBtn = document.getElementById('tab-' + tabId);
+      activeBtn.classList.remove('text-slate-600', 'dark:text-zinc-400', 'hover:text-slate-900', 'dark:hover:text-white');
+      activeBtn.classList.add('bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-cyber-wine', 'dark:text-cyber-neon');
+    }
+
+    // Gerenciador do Modo Escuro / Claro
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        localStorage.setItem('ag-theme', 'light');
+      } else {
+        htmlEl.classList.add('dark');
+        localStorage.setItem('ag-theme', 'dark');
+      }
+    }
+
+    // Inicialização de Tema
+    const savedTheme = localStorage.getItem('ag-theme');
+    if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+
+    // --- ENGENHARIA DE SIMULAÇÃO DA MOCHILA BINÁRIA ---
+    const availableItems = [
+      { id: 1, name: "Notebook", weight: 3, value: 2000, color: "bg-red-500" },
+      { id: 2, name: "Câmera DSLR", weight: 2, value: 900, color: "bg-yellow-500" },
+      { id: 3, name: "Kit de Ferramentas", weight: 4, value: 500, color: "bg-blue-500" },
+      { id: 4, name: "Smartphone Premium", weight: 1, value: 1200, color: "bg-purple-500" },
+      { id: 5, name: "Livro Raro de IA", weight: 1, value: 300, color: "bg-indigo-500" },
+      { id: 6, name: "Garrafa Térmica Smart", weight: 1, value: 150, color: "bg-teal-500" },
+      { id: 7, name: "Casaco de Couro Gótico", weight: 2, value: 600, color: "bg-orange-500" },
+      { id: 8, name: "Console Portátil", weight: 2, value: 1100, color: "bg-pink-500" },
+      { id: 9, name: "Bateria Externa Solar", weight: 1, value: 250, color: "bg-emerald-500" },
+      { id: 10, name: "Drone de Exploração", weight: 3, value: 1500, color: "bg-cyan-500" }
+    ];
+
+    // Variáveis Globais de Execução da Simulação
+    let simConfig = {
+      capacity: 15,
+      popSize: 30,
+      mutRate: 0.1,
+      crossRate: 0.8,
+      maxGen: 40
+    };
+
+    let simState = {
+      generation: 0,
+      population: [],
+      fitnessScores: [],
+      bestFitnessHistory: [],
+      avgFitnessHistory: [],
+      bestIndividual: null,
+      bestIndividualFitness: 0,
+      bestIndividualWeight: 0,
+      intervalId: null,
+      isExecuting: false
+    };
+
+    // Renderiza Lista de Itens na lateral da simulação
+    function renderItemsList() {
+      const container = document.getElementById('items-list-container');
+      container.innerHTML = availableItems.map(item => `
+        <div class="flex items-center justify-between p-1.5 bg-white dark:bg-zinc-950 rounded border border-slate-200 dark:border-zinc-800/80 hover:border-cyber-wine transition-all">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full ${item.color}"></span>
+            <span>${item.name}</span>
+          </div>
+          <span class="text-[10px] text-zinc-400">(${item.weight}kg, $${item.value})</span>
+        </div>
+      `).join('');
+    }
+
+    // Atualiza Labels dos Controles Deslizantes
+    function updateSimParams() {
+      const capacity = parseInt(document.getElementById('sim-capacity').value);
+      const popSize = parseInt(document.getElementById('sim-pop-size').value);
+      const mutRate = parseInt(document.getElementById('sim-mut-rate').value) / 100;
+      const crossRate = parseInt(document.getElementById('sim-cross-rate').value) / 100;
+      const maxGen = parseInt(document.getElementById('sim-max-gen').value);
+
+      document.getElementById('label-cap').innerText = `${capacity} kg`;
+      document.getElementById('label-pop').innerText = popSize;
+      document.getElementById('label-mut').innerText = `${Math.round(mutRate * 100)}%`;
+      document.getElementById('label-cross').innerText = `${Math.round(crossRate * 100)}%`;
+      document.getElementById('label-gen').innerText = maxGen;
+
+      simConfig = { capacity, popSize, mutRate, crossRate, maxGen };
+    }
+
+    // Gerador de Indivíduo Aleatório (Cromossomo Binário)
+    function generateIndividual() {
+      const cromossomo = [];
+      for (let i = 0; i < availableItems.length; i++) {
+        cromossomo.push(Math.random() < 0.35 ? 1 : 0); // Tendência inicial levemente menor para evitar excesso de peso imediato
+      }
+      return cromossomo;
+    }
+
+    // Função de Decodificação e Reparo Baseado em Heurística do Guia 4/8
+    function evaluateAndRepair(individual) {
+      let weight = 0;
+      let value = 0;
+
+      // Cálculo Inicial
+      for (let i = 0; i < individual.length; i++) {
+        if (individual[i] === 1) {
+          weight += availableItems[i].weight;
+          value += availableItems[i].value;
+        }
+      }
+
+      // Heurística de Reparo: Se passar do peso máximo, desativa genes até que caiba
+      if (weight > simConfig.capacity) {
+        // Cria vetor ordenado das posições ativas baseado no custo-benefício (menor valor/peso primeiro)
+        const activeItemIndices = [];
+        for (let i = 0; i < individual.length; i++) {
+          if (individual[i] === 1) {
+            activeItemIndices.push({
+              index: i,
+              ratio: availableItems[i].value / availableItems[i].weight
+            });
+          }
+        }
+        
+        // Ordena para remover os de menor custo benefício primeiro
+        activeItemIndices.sort((a, b) => a.ratio - b.ratio);
+
+        for (let k = 0; k < activeItemIndices.length; k++) {
+          const itemIdx = activeItemIndices[k].index;
+          // Desativa o item
+          individual[itemIdx] = 0;
+          weight -= availableItems[itemIdx].weight;
+          value -= availableItems[itemIdx].value;
+
+          if (weight <= simConfig.capacity) {
+            break;
+          }
+        }
+      }
+
+      return { weight, fitness: value, chromosome: [...individual] };
+    }
+
+    // Algoritmo Genético: Seleção por Torneio
+    function selectParent(populationWithFitness) {
+      // Sorteia 3 combatentes aleatórios
+      const tournamentSize = 3;
+      let best = populationWithFitness[Math.floor(Math.random() * populationWithFitness.length)];
+      for (let i = 1; i < tournamentSize; i++) {
+        const competitor = populationWithFitness[Math.floor(Math.random() * populationWithFitness.length)];
+        if (competitor.fitness > best.fitness) {
+          best = competitor;
+        }
+      }
+      return [...best.chromosome];
+    }
+
+    // Algoritmo Genético: Cruzamento (Crossover de Ponto Único)
+    function crossover(parent1, parent2) {
+      if (Math.random() > simConfig.crossRate) {
+        return [[...parent1], [...parent2]];
+      }
+      const point = Math.floor(Math.random() * (parent1.length - 1)) + 1;
+      const child1 = [...parent1.slice(0, point), ...parent2.slice(point)];
+      const child2 = [...parent2.slice(0, point), ...parent1.slice(point)];
+      return [child1, child2];
+    }
+
+    // Algoritmo Genético: Mutação
+    function mutate(chromosome) {
+      for (let i = 0; i < chromosome.length; i++) {
+        if (Math.random() < simConfig.mutRate) {
+          chromosome[i] = chromosome[i] === 1 ? 0 : 1; // Flip bit
+        }
+      }
+      return chromosome;
+    }
+
+    // Executa uma única Geração Evolutiva
+    function runEvolutionStep() {
+      if (simState.generation >= simConfig.maxGen) {
+        stopSimulation("Finalizado");
+        return;
+      }
+
+      // 1. Avalia população atual e faz os reparos adequados
+      const assessedPopulation = simState.population.map(ind => evaluateAndRepair(ind));
+      
+      // Encontra a melhor solução desta geração
+      let generationBest = assessedPopulation[0];
+      let totalFitness = 0;
+
+      assessedPopulation.forEach(ind => {
+        totalFitness += ind.fitness;
+        if (ind.fitness > generationBest.fitness) {
+          generationBest = ind;
+        }
+      });
+
+      const avgFitness = totalFitness / assessedPopulation.length;
+
+      // Se superou o melhor histórico global
+      if (generationBest.fitness > simState.bestIndividualFitness) {
+        simState.bestIndividual = [...generationBest.chromosome];
+        simState.bestIndividualFitness = generationBest.fitness;
+        simState.bestIndividualWeight = generationBest.weight;
+      }
+
+      // Salva histórico de evolução para o gráfico de progresso
+      simState.bestFitnessHistory.push(generationBest.fitness);
+      simState.avgFitnessHistory.push(avgFitness);
+
+      // 2. Produz a próxima geração
+      const nextGeneration = [];
+
+      // Elitismo: Preserva automaticamente o melhor elemento atual
+      nextGeneration.push([...generationBest.chromosome]);
+
+      while (nextGeneration.length < simConfig.popSize) {
+        const p1 = selectParent(assessedPopulation);
+        const p2 = selectParent(assessedPopulation);
+
+        const [c1, c2] = crossover(p1, p2);
+
+        nextGeneration.push(mutate(c1));
+        if (nextGeneration.length < simConfig.popSize) {
+          nextGeneration.push(mutate(c2));
+        }
+      }
+
+      simState.population = nextGeneration;
+      simState.generation++;
+
+      // Atualiza interface do usuário
+      updateSimulatorUI();
+      drawChart();
+    }
+
+    // Atualização Completa da UI do Simulador
+    function updateSimulatorUI() {
+      document.getElementById('stat-gen').innerText = `${simState.generation} / ${simConfig.maxGen}`;
+      document.getElementById('stat-best-fit').innerText = `$${simState.bestIndividualFitness}`;
+      document.getElementById('stat-weight').innerText = `${simState.bestIndividualWeight} kg`;
+
+      // Visualização do Cromossomo Vencedor Atual
+      const visualContainer = document.getElementById('best-chromosome-visual');
+      if (simState.bestIndividual) {
+        visualContainer.innerHTML = simState.bestIndividual.map((gene, idx) => {
+          const item = availableItems[idx];
+          if (gene === 1) {
+            return `
+              <span class="flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold rounded-md border border-emerald-500 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400">
+                <span class="w-1.5 h-1.5 rounded-full ${item.color}"></span>
+                ${item.name}
+              </span>
+            `;
+          } else {
+            return `
+              <span class="flex items-center gap-1 px-2 py-0.5 text-xs font-mono rounded bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-600 line-through">
+                ${item.name}
+              </span>
+            `;
+          }
+        }).join('');
+      } else {
+        visualContainer.innerHTML = `<span class="text-xs text-zinc-500 dark:text-zinc-400 font-mono italic">Aguardando processamento...</span>`;
+      }
+    }
+
+    // Inicia a execução periódica do AG
+    function startKnapsackSimulation() {
+      if (simState.isExecuting) return;
+
+      if (simState.generation >= simConfig.maxGen || simState.generation === 0) {
+        resetSimulationState();
+      }
+
+      simState.isExecuting = true;
+      document.getElementById('stat-status').innerText = "Rodando";
+      document.getElementById('stat-status').className = "text-xs px-2 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 rounded-full font-mono inline-block mt-1 animate-pulse";
+
+      simState.intervalId = setInterval(runEvolutionStep, 150); // Velocidade de atualização de gerações
+    }
+
+    // Para a simulação
+    function stopSimulation(statusText = "Pausado") {
+      if (simState.intervalId) {
+        clearInterval(simState.intervalId);
+        simState.intervalId = null;
+      }
+      simState.isExecuting = false;
+      
+      const badge = document.getElementById('stat-status');
+      badge.innerText = statusText;
+      if (statusText === "Finalizado") {
+        badge.className = "text-xs px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-950/40 dark:text-purple-400 rounded-full font-mono inline-block mt-1";
+      } else {
+        badge.className = "text-xs px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400 rounded-full font-mono inline-block mt-1";
+      }
+    }
+
+    // Reseta por completo a simulação
+    function resetSimulation() {
+      stopSimulation("Parado");
+      resetSimulationState();
+      updateSimulatorUI();
+      drawChart();
+    }
+
+    // Reinicializa todos os estados lógicos do AG
+    function resetSimulationState() {
+      updateSimParams();
+      simState.generation = 0;
+      simState.bestFitnessHistory = [];
+      simState.avgFitnessHistory = [];
+      simState.bestIndividual = null;
+      simState.bestIndividualFitness = 0;
+      simState.bestIndividualWeight = 0;
+
+      // Popula aleatoriamente
+      simState.population = [];
+      for (let i = 0; i < simConfig.popSize; i++) {
+        simState.population.push(generateIndividual());
+      }
+    }
+
+    // Desenha Gráfico de Linha em Canvas HTML5 Nativo
+    function drawChart() {
+      const canvas = document.getElementById('convergenceChart');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      // Ajusta DPI para telas Retina
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      // Limpa fundo do canvas
+      ctx.fillStyle = '#0a0a0c';
+      ctx.fillRect(0, 0, width, height);
+
+      const margin = { top: 30, right: 20, bottom: 25, left: 45 };
+      const graphWidth = width - margin.left - margin.right;
+      const graphHeight = height - margin.top - margin.bottom;
+
+      // Desenha Grid Horizontal
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = margin.top + (graphHeight / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(width - margin.right, y);
+        ctx.stroke();
+      }
+
+      if (simState.bestFitnessHistory.length === 0) {
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '11px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText("Nenhum dado gerado. Inicie a evolução.", width / 2, height / 2);
+        return;
+      }
+
+      // Encontra valores máximos para escalonamento dinâmico
+      const maxFitnessVal = Math.max(...simState.bestFitnessHistory, 5000); // Teto padrão ou melhor resultado
+      const pointsCount = simConfig.maxGen;
+
+      // Função de mapeamento de coordenadas
+      const getX = (index) => margin.left + (graphWidth / (pointsCount - 1)) * index;
+      const getY = (val) => margin.top + graphHeight - (graphHeight * (val / maxFitnessVal));
+
+      // Desenha Curva da Média da População (Amarelo)
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(getX(0), getY(simState.avgFitnessHistory[0]));
+      for (let i = 1; i < simState.avgFitnessHistory.length; i++) {
+        ctx.lineTo(getX(i), getY(simState.avgFitnessHistory[i]));
+      }
+      ctx.stroke();
+
+      // Desenha Curva do Melhor Fitness Encontrado (Esmeralda)
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(getX(0), getY(simState.bestFitnessHistory[0]));
+      for (let i = 1; i < simState.bestFitnessHistory.length; i++) {
+        ctx.lineTo(getX(i), getY(simState.bestFitnessHistory[i]));
+      }
+      ctx.stroke();
+
+      // Desenha Labels de Fitness (Eixo Y)
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '9px Courier New';
+      ctx.textAlign = 'right';
+      ctx.fillText(`$${maxFitnessVal}`, margin.left - 8, margin.top + 3);
+      ctx.fillText(`$${Math.round(maxFitnessVal / 2)}`, margin.left - 8, margin.top + graphHeight / 2 + 3);
+      ctx.fillText('$0', margin.left - 8, margin.top + graphHeight + 3);
+
+      // Desenha Label de Gerações (Eixo X)
+      ctx.textAlign = 'center';
+      ctx.fillText('Geração 0', margin.left, margin.top + graphHeight + 16);
+      ctx.fillText(`Geração ${simConfig.maxGen}`, width - margin.right, margin.top + graphHeight + 16);
+    }
+
+    // Redimensionamento inteligente do canvas ao alterar viewport
+    window.addEventListener('resize', () => {
+      drawChart();
+    });
+
+    // Inicialização ao carregar página
+    window.onload = function() {
+      lucide.createIcons();
+      renderItemsList();
+      resetSimulation();
+    };
+  </script>
+
+</body>
+</html>
